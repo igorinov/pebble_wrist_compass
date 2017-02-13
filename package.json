@@ -1,0 +1,33 @@
+{
+    "author": "Ivan Gorinov",
+    "dependencies": {},
+    "keywords": [],
+    "name": "compass",
+    "pebble": {
+        "displayName": "Wrist Compass",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "fonts/perfect-dos-vga.ttf",
+                    "name": "FONT_PERFECT_16",
+                    "targetPlatforms": null,
+                    "type": "font"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt",
+            "chalk",
+            "emery"
+        ],
+        "uuid": "6d508523-2fc0-4c2d-86d8-5ff2be2198b2",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
