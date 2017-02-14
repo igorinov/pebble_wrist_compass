@@ -209,7 +209,7 @@ static void time_update_proc(Layer *layer, GContext *ctx) {
     strftime(s_time_buffer, 16, "%I:%M%P", t);
   }
 
-  graphics_context_set_text_color(ctx, GColorMediumAquamarine);
+  graphics_context_set_text_color(ctx, GColorLightGray);
   graphics_draw_text(ctx, s_time_buffer, s_font, time_rect,
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
@@ -226,7 +226,19 @@ static void digits_update_proc(Layer *layer, GContext *ctx) {
 
   snprintf(s_head_buffer, 16, " %03d°", g_degrees);
 
-  graphics_context_set_text_color(ctx, GColorChromeYellow);
+  graphics_context_set_text_color(ctx, GColorBlack);
+
+  if(g_heading.compass_status == CompassStatusDataInvalid) {
+    graphics_context_set_text_color(ctx, GColorRed);
+    strcpy(s_head_buffer, " ----");
+  }
+
+  if(g_heading.compass_status == CompassStatusCalibrating)
+    graphics_context_set_text_color(ctx, GColorChromeYellow);
+
+  if(g_heading.compass_status == CompassStatusCalibrated)
+    graphics_context_set_text_color(ctx, GColorMalachite);
+
   graphics_draw_text(ctx, s_head_buffer, s_font, head_rect,
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
@@ -239,12 +251,18 @@ static void needle_update_proc(Layer *layer, GContext *ctx) {
   int32_t needle_angle = g_heading.magnetic_heading;
   const int32_t r = (A * B) << 16;
 
-  int32_t sy = sin_lookup(needle_angle);
-  int32_t sx = cos_lookup(needle_angle);
+  int32_t sy = 0;
+  int32_t sx = 0;
   int32_t alpha;
   uint8_t c;
   int x, y;
-  
+
+  if(g_heading.compass_status == CompassStatusDataInvalid)
+    return;
+
+  sy = sin_lookup(needle_angle);
+  sx = cos_lookup(needle_angle);
+
   // Iterate over all rows
   for (y = center.y - 56; y <= center.y + 56; y += 1) {
     // Get this row's range and data
@@ -308,7 +326,6 @@ static void needle_update_proc(Layer *layer, GContext *ctx) {
       }
       
       // Red filled triangle
-
       if (ry > 0) {
           c = ARROW_COLOR_S;
         if (ld + L > 0) {
