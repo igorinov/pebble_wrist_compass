@@ -13,6 +13,7 @@ static char s_head_buffer[16] = "";
 static BatteryChargeState g_charge;
 static CompassHeadingData g_heading;
 static int16_t g_degrees = -1;
+static int16_t g_second = 0;
 
 static GFont s_font;
 
@@ -191,10 +192,9 @@ static void charge_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void time_update_proc(Layer *layer, GContext *ctx) {
+#ifdef PBL_ROUND
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
-
-#ifdef PBL_ROUND
   GRect time_rect = GRect(center.x - 20, center.y - 88, 64, 16);
 #else
   GRect time_rect = GRect(0, 0, 64, 16);
@@ -209,7 +209,7 @@ static void time_update_proc(Layer *layer, GContext *ctx) {
     strftime(s_time_buffer, 16, "%I:%M%P", t);
   }
 
-  graphics_context_set_text_color(ctx, GColorLightGray);
+  graphics_context_set_text_color(ctx, GColorWhite);
   graphics_draw_text(ctx, s_time_buffer, s_font, time_rect,
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
@@ -220,24 +220,35 @@ static void digits_update_proc(Layer *layer, GContext *ctx) {
 
 #ifdef PBL_ROUND
   GRect head_rect = GRect(center.x + 8, center.y - 72, 48, 16);
+  GPoint status_center = GPoint(center.x + 48, center.y + 48);
 #else
-  GRect head_rect = GRect(80, 0, 64, 16);
+  GRect head_rect = GRect(80, 0, 48, 16);
+  GPoint status_center = GPoint(134, 10);
 #endif
 
   snprintf(s_head_buffer, 16, " %03d°", g_degrees);
 
-  graphics_context_set_text_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  graphics_context_set_text_color(ctx, GColorWhite);
 
   if(g_heading.compass_status == CompassStatusDataInvalid) {
-    graphics_context_set_text_color(ctx, GColorRed);
+    graphics_context_set_fill_color(ctx, GColorRed);
     strcpy(s_head_buffer, " ----");
   }
 
-  if(g_heading.compass_status == CompassStatusCalibrating)
-    graphics_context_set_text_color(ctx, GColorChromeYellow);
+  if(g_heading.compass_status == CompassStatusCalibrating) {
+    if (g_second & 1)
+      graphics_context_set_fill_color(ctx, GColorChromeYellow);
+    else
+      graphics_context_set_fill_color(ctx, GColorArmyGreen);
+  }
 
   if(g_heading.compass_status == CompassStatusCalibrated)
-    graphics_context_set_text_color(ctx, GColorMalachite);
+    graphics_context_set_fill_color(ctx, GColorMediumSpringGreen);
+
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_fill_circle(ctx, status_center, 8);
+  graphics_draw_circle(ctx, status_center, 8);
 
   graphics_draw_text(ctx, s_head_buffer, s_font, head_rect,
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
@@ -346,7 +357,8 @@ static void needle_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
-  layer_mark_dirty(s_time_layer);
+  g_second = tick_time->tm_sec;
+  layer_mark_dirty(s_digits_layer);
 }
 
 static void charge_handler(BatteryChargeState charge)
