@@ -347,7 +347,7 @@ static void needle_update_proc(Layer *layer, GContext *ctx) {
   }
   graphics_release_frame_buffer(ctx, fb);
 
-  int16_t deg = TRIGANGLE_TO_DEG(needle_angle);
+  int16_t deg = TRIGANGLE_TO_DEG(TRIG_MAX_ANGLE - needle_angle);
   if (deg != g_degrees) {
     g_degrees = deg;
     layer_mark_dirty(s_digits_layer);
