@@ -147,17 +147,15 @@ static void back_update_proc(Layer *layer, GContext *ctx) {
 
   graphics_context_set_fill_color(ctx, GColorIcterine);
 
-  for (int i = 0; i < 8; i += 1) {
-    gpath_move_to(path_n, center);
-    gpath_move_to(path_s, center);
-    gpath_move_to(path_w, center);
-    gpath_move_to(path_e, center);
+  gpath_move_to(path_n, center);
+  gpath_move_to(path_s, center);
+  gpath_move_to(path_w, center);
+  gpath_move_to(path_e, center);
 
-    gpath_draw_filled(ctx, path_n);
-    gpath_draw_filled(ctx, path_s);
-    gpath_draw_filled(ctx, path_w);
-    gpath_draw_filled(ctx, path_e);
-  }
+  gpath_draw_filled(ctx, path_n);
+  gpath_draw_filled(ctx, path_s);
+  gpath_draw_filled(ctx, path_w);
+  gpath_draw_filled(ctx, path_e);
 }
 
 static void charge_update_proc(Layer *layer, GContext *ctx) {
