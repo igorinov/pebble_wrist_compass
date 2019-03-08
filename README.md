@@ -1,5 +1,7 @@
 # Wrist Compass
-Compass with a needle and digital heading indication
+Magnetic compass with a needle and digital heading indication
+
+[App page on Rebble](https://apps.rebble.io/en_US/application/58a14b0b0dfc32b76100021d)
 
 ## Supported [platforms](https://developer.pebble.com/guides/tools-and-resources/hardware-information/)
 
